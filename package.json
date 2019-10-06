@@ -1,0 +1,25 @@
+{
+  "name": "homebridge-shinobi",
+  "version": "1.0.0",
+  "description": "A Homebridge plugin integrating Shinobi for motion detector cameras",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vectronic/homebridge-shinobi.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vectronic/homebridge-shinobi/issues"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "camera",
+    "motion",
+    "shinobi"
+  ],
+  "author": "vectronic",
+  "license": "MIT",
+  "engines": {
+    "homebridge": ">=0.4.46"
+  },
+  "dependencies": {}
+}
