@@ -14,6 +14,7 @@ Example `config.json` entry:
 ```
 "platforms": [
     {
+        "platform": "Shinobi",
         "shinobiApi": "http:/x.x.x.x:8080",
         "apiKey": "xxx",
         "groupKey": "house",

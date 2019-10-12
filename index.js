@@ -5,7 +5,7 @@ const fs = require('fs');
 const https = require('https');
 const express = require('express');
 
-const ShinobiCameraSource = require('./shonobi_camera_source').ShinobiCameraSource;
+const ShinobiCameraSource = require('./shinobi_camera_source').ShinobiCameraSource;
 
 let Service, Characteristic, Accessory, hap, UUIDGen;
 
