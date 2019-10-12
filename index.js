@@ -10,9 +10,14 @@ const ShinobiCameraSource = require('./shinobi_camera_source').ShinobiCameraSour
 let Service, Characteristic, Accessory, hap, UUIDGen;
 
 
-function ShinobiPlatform(log, config) {
+function ShinobiPlatform(log, config, api) {
     this.log = log;
     this.config = config;
+    this.api = api;
+
+    if (!this.config) {
+        return;
+    }
 
     this.cameraSources = [];
     this.cameraAccessories = [];
@@ -102,7 +107,7 @@ ShinobiPlatform.prototype.didFinishLaunching = function didFinishLaunching() {
                 this.log(`ShinobiPlatform.didFinishLaunching() error: ${err.message}`);
             });
 
-        promise.push(promise);
+        promises.push(promise);
     }
 
     Promise.all(promises).then(() => {
