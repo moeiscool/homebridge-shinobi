@@ -12,7 +12,7 @@ function ShinobiCameraSource(hap, log, config, monitorConfig) {
     this.log = log;
     this.config = config;
     this.monitorConfig = monitorConfig;
-    this.name = monitorConfig.name;
+    this.name = `${monitorConfig.name} - camera`;
 
     uuid = hap.uuid;
     Service = hap.Service;

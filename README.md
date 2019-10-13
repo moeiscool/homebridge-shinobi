@@ -55,7 +55,7 @@ Snapshot images for each Monitor are simply pulled from the Shinobi API.
 
 A webhook URL should be configured for each Monitor within the Shinobi 'Global Detector Settings' with the following format:
 
-`http[s]://<homebridge_ip>>:<web_hook_port>/mid=<monitors[index]>&group=<groupKey` 
+`http[s]://<homebridge_ip>>:<web_hook_port>/mid=<monitors[index]>&group=<groupKey>` 
 
 For example, assuming the Homebridge instance is available at 192.168.1.10 and using the above sample config,
 the two Monitors `front` and `rear` would have webhook URLs configured as:  

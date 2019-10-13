@@ -30,44 +30,6 @@ function ShinobiPlatform(log, config, api) {
 
 ShinobiPlatform.prototype.accessories = function accessories(callback) {
 
-    const app = express();
-
-    app.get('/', (function(request, response) {
-
-        const monitorId = request.query.mid;
-        const group = request.query.group;
-
-        this.log(`Shinobi motion webhook: group = ${group}, monitorId = ${monitorId}`);
-
-        if ((this.config.groupKey === group) && this.motionAccessories[monitorId]) {
-
-            const motionAccessory = this.motionAccessories[monitorId];
-
-            motionAccessory.setMotion(true);
-
-            setTimeout(motionAccessory.setMotion.bind(motionAccessory), 1000, false);
-
-            response.sendStatus(200);
-        }
-        else {
-            response.sendStatus(400);
-        }
-
-    }).bind(this));
-
-    if (this.config.httpsKeyPath && this.config.httpsCertPath) {
-        const options = {
-            key: fs.readFileSync(this.config.httpsKeyPath),
-            cert: fs.readFileSync(this.config.httpsCertPath)
-        };
-        https.createServer(options, app).listen(this.config.web_hook_port);
-        this.log(`Started HTTPS server for homebridge-shinobi webhooks on port ${this.config.web_hook_port}`);
-    }
-    else {
-        app.listen(this.config.web_hook_port);
-        this.log(`Started HTTP server for homebridge-shinobi webhooks on port ${this.config.web_hook_port}`);
-    }
-
     const accessories = [];
 
     for (let i = 0; i < this.config.monitors.length; i++) {
@@ -123,6 +85,44 @@ ShinobiPlatform.prototype.didFinishLaunching = function didFinishLaunching() {
     .catch(err => {
         this.log(`ShinobiPlatform.didFinishLaunching() error: ${err.message}`);
     });
+
+    const app = express();
+
+    app.get('/', (function(request, response) {
+
+        const monitorId = request.query.mid;
+        const group = request.query.group;
+
+        this.log(`Shinobi motion webhook: group = ${group}, monitorId = ${monitorId}`);
+
+        if ((this.config.groupKey === group) && this.motionAccessories[monitorId]) {
+
+            const motionAccessory = this.motionAccessories[monitorId];
+
+            motionAccessory.setMotion(true);
+
+            setTimeout(motionAccessory.setMotion.bind(motionAccessory), 1000, false);
+
+            response.sendStatus(200);
+        }
+        else {
+            response.sendStatus(400);
+        }
+
+    }).bind(this));
+
+    if (this.config.httpsKeyPath && this.config.httpsCertPath) {
+        const options = {
+            key: fs.readFileSync(this.config.httpsKeyPath),
+            cert: fs.readFileSync(this.config.httpsCertPath)
+        };
+        https.createServer(options, app).listen(this.config.web_hook_port);
+        this.log(`Started HTTPS server for homebridge-shinobi webhooks on port '${this.config.web_hook_port}'`);
+    }
+    else {
+        app.listen(this.config.web_hook_port);
+        this.log(`Started HTTP server for homebridge-shinobi webhooks on port '${this.config.web_hook_port}'`);
+    }
 };
 
 
@@ -143,7 +143,7 @@ function ShinobiMonitorAccessory(log, monitorId) {
 
     this.log = log;
     this.monitorId = monitorId;
-    this.name = monitorId;
+    this.name = `${monitorId} - motion sensor`;
 
     this.motionService = new Service.MotionSensor(this.monitorId);
 
