@@ -69,12 +69,12 @@ ShinobiPlatform.prototype.accessories = function accessories(callback) {
             key: fs.readFileSync(this.config.httpsKeyPath),
             cert: fs.readFileSync(this.config.httpsCertPath)
         };
-        https.createServer(options, app).listen(this.web_hook_port);
-        this.log(`Started HTTPS server for homebridge-shinobi webhooks on port ${this.web_hook_port}`);
+        https.createServer(options, app).listen(this.config.web_hook_port);
+        this.log(`Started HTTPS server for homebridge-shinobi webhooks on port ${this.config.web_hook_port}`);
     }
     else {
         app.listen(this.config.web_hook_port);
-        this.log(`Started HTTP server for homebridge-shinobi webhooks on port ${this.web_hook_port}`);
+        this.log(`Started HTTP server for homebridge-shinobi webhooks on port ${this.config.web_hook_port}`);
     }
 };
 
@@ -102,6 +102,8 @@ ShinobiPlatform.prototype.didFinishLaunching = function didFinishLaunching() {
 
                 this.cameraAccessories[monitorId] = cameraAccessory;
                 this.cameraSources[monitorId] = cameraSource;
+
+                this.log(`ShinobiPlatform.didFinishLaunching() added camera for monitor ID: ${monitorId}`);
             })
             .catch(err => {
                 this.log(`ShinobiPlatform.didFinishLaunching() error: ${err.message}`);
@@ -111,7 +113,7 @@ ShinobiPlatform.prototype.didFinishLaunching = function didFinishLaunching() {
     }
 
     Promise.all(promises).then(() => {
-        this.api.publishCameraAccessories('Shinobi', cameraAccessories);
+        this.api.publishCameraAccessories('Shinobi', this.cameraAccessories);
     })
     .catch(err => {
         this.log(`ShinobiPlatform.didFinishLaunching() error: ${err.message}`);
