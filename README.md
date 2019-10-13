@@ -5,6 +5,7 @@
 1. Install homebridge using: `npm install -g homebridge`
 2. Install this plugin: `npm install -g homebridge-shinobi`
 3. Update your `config.json` configuration file
+4. Ensure `ffmpeg` is installed and on the path
 
 **NOTE**: Currently there is no support for streaming audio from a camera.
  

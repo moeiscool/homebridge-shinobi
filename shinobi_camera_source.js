@@ -80,7 +80,8 @@ ShinobiCameraSource.prototype.handleSnapshotRequest = function handleSnapshotReq
     this.log(`handleSnapshotRequest: ${this.name} => ${JSON.stringify(request)} from ${this.imageSource}`);
 
     fetch(this.imageSource)
-        .then(res => callback(undefined, res.buffer()))
+        .then(res => res.buffer())
+        .then(buffer => callback(undefined, buffer))
         .catch(err => {
             this.log(`ShinobiCameraSource.handleSnapshotRequest() error: ${err.message}`);
             callback(err);

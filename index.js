@@ -30,15 +30,6 @@ function ShinobiPlatform(log, config, api) {
 
 ShinobiPlatform.prototype.accessories = function accessories(callback) {
 
-    for (let i = 0; i < this.config.monitors.length; i++) {
-
-        const monitorId = this.config.monitors[i];
-
-        this.motionAccessories[monitorId] = new ShinobiMonitorAccessory(this.log, monitorId);
-    }
-
-    callback(this.motionAccessories);
-
     const app = express();
 
     app.get('/', (function(request, response) {
@@ -76,6 +67,20 @@ ShinobiPlatform.prototype.accessories = function accessories(callback) {
         app.listen(this.config.web_hook_port);
         this.log(`Started HTTP server for homebridge-shinobi webhooks on port ${this.config.web_hook_port}`);
     }
+
+    const accessories = [];
+
+    for (let i = 0; i < this.config.monitors.length; i++) {
+
+        const monitorId = this.config.monitors[i];
+
+        const accessory = new ShinobiMonitorAccessory(this.log, monitorId);
+
+        this.motionAccessories[monitorId] = accessory;
+        accessories.push(accessory);
+    }
+
+    callback(accessories);
 };
 
 
@@ -138,6 +143,7 @@ function ShinobiMonitorAccessory(log, monitorId) {
 
     this.log = log;
     this.monitorId = monitorId;
+    this.name = monitorId;
 
     this.motionService = new Service.MotionSensor(this.monitorId);
 
