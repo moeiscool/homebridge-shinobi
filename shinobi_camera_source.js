@@ -2,6 +2,7 @@
 
 let uuid, Service, Characteristic, StreamController;
 
+const fetch = require('node-fetch');
 const ip = require('ip');
 const spawn = require('child_process').spawn;
 
@@ -76,7 +77,7 @@ ShinobiCameraSource.prototype.handleCloseConnection = function(connectionID) {
 
 ShinobiCameraSource.prototype.handleSnapshotRequest = function handleSnapshotRequest(request, callback) {
 
-    this.log(`handleSnapshotRequest: ${this.name} => ${JSON.stringify(request)}`);
+    this.log(`handleSnapshotRequest: ${this.name} => ${JSON.stringify(request)} from ${this.imageSource}`);
 
     fetch(this.imageSource)
         .then(res => callback(undefined, res.buffer()))
