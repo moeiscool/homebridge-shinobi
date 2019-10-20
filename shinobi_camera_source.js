@@ -19,10 +19,10 @@ function ShinobiCameraSource(hap, log, config, monitorConfig) {
     Characteristic = hap.Characteristic;
     StreamController = hap.StreamController;
 
-    this.imageSource = `${this.config.shinobiApi}${this.monitorConfig.snapshot}`;
+    this.imageSource = `${this.config.shinobi_api}${this.monitorConfig.snapshot}`;
 
     // default to shinobi video source...
-    this.videoSource = `${this.config.shinobiApi}${this.monitorConfig.streams[0]}`;
+    this.videoSource = `${this.config.shinobi_api}${this.monitorConfig.streams[0]}`;
 
     // ...but prefer to connect directly to stream if possible
     const details = JSON.parse(this.monitorConfig.details);

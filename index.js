@@ -53,7 +53,7 @@ ShinobiPlatform.prototype.didFinishLaunching = function didFinishLaunching() {
     for (let i = 0; i < this.config.monitors.length; i++) {
 
         const monitorId = this.config.monitors[i];
-        const url = `${this.config.shinobiApi}/${this.config.apiKey}/monitor/${this.config.groupKey}/${monitorId}`;
+        const url = `${this.config.shinobi_api}/${this.config.api_key}/monitor/${this.config.group_key}/${monitorId}`;
 
         const promise = fetch(url)
             .then(res => res.json())
@@ -95,7 +95,7 @@ ShinobiPlatform.prototype.didFinishLaunching = function didFinishLaunching() {
 
         this.log(`Shinobi motion webhook: group = ${group}, monitorId = ${monitorId}`);
 
-        if ((this.config.groupKey === group) && this.motionAccessories[monitorId]) {
+        if ((this.config.group_key === group) && this.motionAccessories[monitorId]) {
 
             const motionAccessory = this.motionAccessories[monitorId];
 
@@ -111,10 +111,10 @@ ShinobiPlatform.prototype.didFinishLaunching = function didFinishLaunching() {
 
     }).bind(this));
 
-    if (this.config.httpsKeyPath && this.config.httpsCertPath) {
+    if (this.config.https_key_path && this.config.https_cert_path) {
         const options = {
-            key: fs.readFileSync(this.config.httpsKeyPath),
-            cert: fs.readFileSync(this.config.httpsCertPath)
+            key: fs.readFileSync(this.config.https_key_path),
+            cert: fs.readFileSync(this.config.https_cert_path)
         };
         https.createServer(options, app).listen(this.config.web_hook_port);
         this.log(`Started HTTPS server for homebridge-shinobi webhooks on port '${this.config.web_hook_port}'`);
