@@ -19,7 +19,7 @@
   "author": "vectronic",
   "license": "MIT",
   "engines": {
-    "homebridge": ">=0.4.46"
+    "homebridge": ">=1.1.0"
   },
   "dependencies": {
     "express": "^4.17.1",

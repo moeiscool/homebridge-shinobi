@@ -80,7 +80,7 @@ ShinobiPlatform.prototype.didFinishLaunching = function didFinishLaunching() {
     }
 
     Promise.all(promises).then(() => {
-        this.api.publishCameraAccessories('Shinobi', this.cameraAccessories);
+        this.api.publishCameraAccessories('homebridge-shinobi', this.cameraAccessories);
     })
     .catch(err => {
         this.log(`ShinobiPlatform.didFinishLaunching() error: ${err.message}`);
