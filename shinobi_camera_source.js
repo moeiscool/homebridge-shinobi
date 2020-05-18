@@ -7,12 +7,12 @@ const ip = require('ip');
 const spawn = require('child_process').spawn;
 
 
-function ShinobiCameraSource(hap, log, config, monitorConfig) {
+function ShinobiCameraSource(hap, log, config, monitorConfig, shinobiMonitorConfig) {
 
     this.log = log;
     this.config = config;
-    this.monitorConfig = monitorConfig;
-    this.name = `${monitorConfig.name} - camera`;
+    this.monitorConfig = shinobiMonitorConfig;
+    this.name = `${monitorConfig.display_name} camera`;
 
     uuid = hap.uuid;
     Service = hap.Service;
@@ -202,6 +202,7 @@ ShinobiCameraSource.prototype.createStreamControllers = function createStreamCon
     let self = this;
 
     for (let i = 0; i < maxStreams; i++) {
+        this.log(`created  streamController ${self.name} [${i}]`);
 
         const streamController = new StreamController(i, options, self);
 

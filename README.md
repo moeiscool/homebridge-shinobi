@@ -20,8 +20,14 @@ Example `config.json` entry:
         "api_key": "xxx",
         "group_key": "house",
         "monitors": [
-            "front",
-            "rear"
+            {
+                "display_name": "Front Porch",
+                "shinobi_id": "front"
+            },
+            {
+                "display_name": "Rear Garden",
+                "shinobi_id": "rear"
+            }
         ],
         "web_hook_port": "8443",
         "https_key_path": "/cert/privkey.pem",
@@ -34,7 +40,9 @@ Where:
 * `shinobi_api` is the base URL for the [Shinobi API](https://shinobi.video/docs/api)
 * `api_key` is a permanent Shinobi API key (configured in the Shinobi dashboard API menu)
 * `group_key` is a Shinobi group key
-* `monitors` contains a list of Monitor IDs
+* `monitors` contains a list of monitors consisting of:
+** `display_name`
+** `shinobi_id`
 * `web_hook_port` is the port that the platform should listen on for motion event webhooks from Shinobi
 
 If both `https_key_path` and `https_cert_path` are configured to point at HTTPS key and cert files available on the Homebridge

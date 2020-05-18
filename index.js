@@ -34,11 +34,11 @@ ShinobiPlatform.prototype.accessories = function accessories(callback) {
 
     for (let i = 0; i < this.config.monitors.length; i++) {
 
-        const monitorId = this.config.monitors[i];
+        const monitorConfig = this.config.monitors[i];
 
-        const accessory = new ShinobiMonitorAccessory(this.log, monitorId);
+        const accessory = new ShinobiMonitorAccessory(this.log, monitorConfig);
 
-        this.motionAccessories[monitorId] = accessory;
+        this.motionAccessories[monitorConfig.shinobi_id] = accessory;
         accessories.push(accessory);
     }
 
@@ -52,25 +52,28 @@ ShinobiPlatform.prototype.didFinishLaunching = function didFinishLaunching() {
 
     for (let i = 0; i < this.config.monitors.length; i++) {
 
-        const monitorId = this.config.monitors[i];
-        const url = `${this.config.shinobi_api}/${this.config.api_key}/monitor/${this.config.group_key}/${monitorId}`;
+        const monitorConfig = this.config.monitors[i];
+        const url = `${this.config.shinobi_api}/${this.config.api_key}/monitor/${this.config.group_key}/${monitorConfig.shinobi_id}`;
 
         const promise = fetch(url)
             .then(res => res.json())
-            .then(monitorConfig => {
+            .then(shinobiMonitorConfig => {
 
-                const uuid = UUIDGen.generate(monitorId);
+                const uuid = UUIDGen.generate(monitorConfig.display_name);
 
-                const cameraAccessory = new Accessory(monitorId, uuid, hap.Accessory.Categories.CAMERA);
+                const cameraAccessory = new Accessory(monitorConfig.display_name, uuid, hap.Accessory.Categories.CAMERA);
+                const cameraAccessoryInfo = cameraAccessory.getService(Service.AccessoryInformation);
+                cameraAccessoryInfo.setCharacteristic(Characteristic.Manufacturer, 'homebridge-shinobi');
+                cameraAccessoryInfo.setCharacteristic(Characteristic.Model, 'shinobi');
 
-                const cameraSource = new ShinobiCameraSource(hap, this.log, this.config, monitorConfig);
+                const cameraSource = new ShinobiCameraSource(hap, this.log, this.config, monitorConfig, shinobiMonitorConfig);
 
                 cameraAccessory.configureCameraSource(cameraSource);
 
-                this.cameraAccessories[monitorId] = cameraAccessory;
-                this.cameraSources[monitorId] = cameraSource;
+                this.cameraAccessories[monitorConfig.shinobi_id] = cameraAccessory;
+                this.cameraSources[monitorConfig.shinobi_id] = cameraSource;
 
-                this.log(`ShinobiPlatform.didFinishLaunching() added camera for monitor ID: ${monitorId}`);
+                this.log(`ShinobiPlatform.didFinishLaunching() added camera ${monitorConfig.display_name} for monitor ID: ${monitorConfig.shinobi_id}`);
             })
             .catch(err => {
                 this.log(`ShinobiPlatform.didFinishLaunching() error: ${err.message}`);
@@ -81,6 +84,7 @@ ShinobiPlatform.prototype.didFinishLaunching = function didFinishLaunching() {
 
     Promise.all(promises).then(() => {
         this.api.publishCameraAccessories('homebridge-shinobi', this.cameraAccessories);
+        this.log('Camera accessories published');
     })
     .catch(err => {
         this.log(`ShinobiPlatform.didFinishLaunching() error: ${err.message}`);
@@ -130,22 +134,22 @@ ShinobiPlatform.prototype.shutdown = function shutdown() {
 
     for (let i = 0; i < this.config.monitors.length; i++) {
 
-        const monitorId = this.config.monitors[i];
+        const monitorConfig = this.config.monitors[i];
 
-        if (this.cameraSources[monitorId]) {
-            this.cameraSources[monitorId].shutdown();
+        if (this.cameraSources[monitorConfig.shinobi_id]) {
+            this.cameraSources[monitorConfig.shinobi_id].shutdown();
         }
     }
 };
 
 
-function ShinobiMonitorAccessory(log, monitorId) {
+function ShinobiMonitorAccessory(log, monitorConfig) {
 
     this.log = log;
-    this.monitorId = monitorId;
-    this.name = `${monitorId} - motion sensor`;
+    this.monitorId = monitorConfig.shinobi_id;
+    this.name = `${monitorConfig.display_name} motion`;
 
-    this.motionService = new Service.MotionSensor(this.monitorId);
+    this.motionService = new Service.MotionSensor(this.name);
 
     this.setMotion(false);
 }
