@@ -21,12 +21,10 @@ Example `config.json` entry:
         "group_key": "house",
         "monitors": [
             {
-                "display_name": "Front Porch",
-                "shinobi_id": "front"
+                "monitor_id": "front"
             },
             {
-                "display_name": "Rear Garden",
-                "shinobi_id": "rear"
+                "monitor_id": "rear"
             }
         ],
         "web_hook_port": "8443",
@@ -38,11 +36,10 @@ Example `config.json` entry:
 Where:
 
 * `shinobi_api` is the base URL for the [Shinobi API](https://shinobi.video/docs/api)
-* `api_key` is a permanent Shinobi API key (configured in the Shinobi dashboard API menu)
+* `api_key` is the Shinobi API key (configured in the Shinobi dashboard API menu)
 * `group_key` is a Shinobi group key
 * `monitors` contains a list of monitors consisting of:
-** `display_name`
-** `shinobi_id`
+** `monitor_id`
 * `web_hook_port` is the port that the platform should listen on for motion event webhooks from Shinobi
 
 If both `https_key_path` and `https_cert_path` are configured to point at HTTPS key and cert files available on the Homebridge
@@ -52,8 +49,8 @@ server the webhook server will be hosted on HTTPS.
 
 The specified `shinobi_api` and `api_key` will be used to make all Shinobi API requests.
 
-Each of the specified `monitor` IDs will be used with the specified `group_key` to add a new Homebridge Camera accessory
-to the platform together with a paired Motion Sensor accessory.
+Each of the specified `monitor` IDs will be used with the specified `group_key` to add a new accessory
+to the platform consistent of a Motion Sensor service and camera.
 
 When viewing video, the plugin will use the information returned from the API for a specific Monitor to determine
 the source video stream configured. FFmpeg is used to stream directly from the camera and forward to HomeKit. If possible, 
@@ -63,7 +60,7 @@ Snapshot images for each Monitor are simply pulled from the Shinobi API.
 
 A webhook URL should be configured for each Monitor within the Shinobi 'Global Detector Settings' with the following format:
 
-`http[s]://<homebridge_ip>>:<web_hook_port>?mid=<monitors[index]>&group=<group_key>` 
+`http[s]://<homebridge_ip>>:<web_hook_port>?mid=<monitors[index].monitor_id>&group=<group_key>` 
 
 For example, assuming the Homebridge instance is available at 192.168.1.10 and using the above sample config,
 the two Monitors `front` and `rear` would have webhook URLs configured as:  

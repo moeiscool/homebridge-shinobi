@@ -1,0 +1,59 @@
+{
+  "pluginAlias": "ShinobiHomebridgePlatform",
+  "pluginType": "platform",
+  "singular": false,
+  "schema": {
+    "type": "object",
+    "required": [
+      "shinobi_api",
+      "api_key",
+      "group_key",
+      "monitors"
+    ],
+    "additionalProperties": true,
+    "properties": {
+      "shinobi_api": {
+        "type": "string",
+        "description": "The base URL for the Shinobi API (Refer to https://shinobi.video/docs/api)."
+      },
+      "api_key": {
+        "type": "string",
+        "description": "the Shinobi API key (configured in the Shinobi dashboard API menu)."
+      },
+      "group_key": {
+        "type": "string",
+        "description": "A Shinobi group key."
+      },
+      "monitors": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "monitor_id"
+          ],
+          "properties": {
+            "monitor_id": {
+              "type": "string",
+              "description": "The Shinobi monitor ID."
+            }
+          }
+        }
+      },
+      "web_hook_port": {
+        "type": "number",
+        "description": "The port that the platform should listen on for motion event webhooks from Shinobi.",
+        "default":  8080
+      },
+      "https_key_path": {
+        "type": "string",
+        "description": "If this AND https_cert_path are configured to point at valid files accessible by the platform the webhook server will use HTTPS.",
+        "default": "/cert/privkey.pem"
+      },
+      "https_cert_path": {
+        "type": "string",
+        "description": "If this AND https_key_path are configured to point at valid files accessible by the platform the webhook server will use HTTPS.",
+        "default": "/cert/fullchain.pem"
+      }
+    }
+  }
+}
