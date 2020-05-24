@@ -101,7 +101,7 @@ export class ShinobiMonitorAccessory {
         // push the new value to HomeKit
         this.motionService.updateCharacteristic(this.platform.Characteristic.MotionDetected, this.motionDetected);
 
-        this.platform.log.debug(`Pushed updated current MotionDetected state to HomeKit: ${this.motionDetected}`);
+        this.platform.log.debug(`pushed updated current MotionDetected state to HomeKit: ${this.motionDetected}`);
 
         // reset motion state after one second
         if (detected) {

@@ -56,7 +56,7 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
 
         const shinobiConfig = this.monitor.shinobiConfig;
 
-        this.platform.log.info(`Creating ShinobiStreamingDelegate using shinobi config: ${JSON.stringify(shinobiConfig)}`);
+        this.platform.log.info(`creating ShinobiStreamingDelegate using shinobi config: ${JSON.stringify(shinobiConfig)}`);
 
         this.imageSource = `${this.platform.config.shinobi_api}${shinobiConfig.snapshot}`;
 
@@ -147,7 +147,7 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
                 const sessionInfo = this.pendingSessions[sessionId];
 
                 if (!sessionInfo) {
-                    const message = 'Unknown sessionIdentifier: '
+                    const message = 'unknown sessionIdentifier: '
                         + `${this.monitor.monitorConfig.monitor_id} => ${sessionId} for start request!`;
                     this.platform.log.warn(message);
                     callback(new Error(message));
@@ -169,7 +169,7 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
                 const ssrc = sessionInfo.videoSSRC;
                 const videoSRTP = sessionInfo.videoSRTP.toString('base64');
 
-                this.platform.log.debug(`Requested video stream: ${width}x${height}, ${fps} fps, ${maxBitrate} kbps, ${mtu} mtu`);
+                this.platform.log.debug(`requested video stream: ${width}x${height}, ${fps} fps, ${maxBitrate} kbps, ${mtu} mtu`);
 
                 let ffmpegCommand = `-i ${this.videoSource} -vsync drop -vcodec copy -an `
                     + `-f rtp -payload_type ${payloadType} -ssrc ${ssrc} `;
@@ -188,7 +188,7 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
                 ffmpegProcess.stderr.on('data', () => {
                     if (!started) {
                         started = true;
-                        this.platform.log.debug('FFMPEG: received first frame');
+                        this.platform.log.debug('ffmpeg received first frame');
 
                         // do not forget to execute callback once set up
                         callback();
@@ -196,7 +196,7 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
                 });
 
                 ffmpegProcess.on('error', error => {
-                    this.platform.log.error(`Failed to start video stream: ${error.message}`);
+                    this.platform.log.error(`failed to start video stream: ${error.message}`);
                     callback(new Error('ffmpeg process creation failed!'));
                 });
 
@@ -224,7 +224,7 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
 
             case StreamRequestTypes.RECONFIGURE:
                 // not supported
-                this.platform.log.warn(`Received (unsupported) request to reconfigure to: ${JSON.stringify(request.video)}`);
+                this.platform.log.warn(`received (unsupported) request to reconfigure to: ${JSON.stringify(request.video)}`);
                 callback();
                 break;
 
@@ -233,13 +233,13 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
                 const existingFfmpegProcess = this.ongoingSessions[sessionId];
 
                 if (!existingFfmpegProcess) {
-                    const message = `Unknown sessionIdentifier: ${this.monitor.monitorConfig.monitor_id} => ${sessionId} for stop request!`;
+                    const message = `unknown sessionIdentifier: ${this.monitor.monitorConfig.monitor_id} => ${sessionId} for stop request!`;
                     this.platform.log.warn(message);
                     callback(new Error(message));
                     return;
                 }
 
-                this.platform.log.info(`Killing: ${this.monitor.monitorConfig.monitor_id} `
+                this.platform.log.info(`killing: ${this.monitor.monitorConfig.monitor_id} `
                     + `=> ${sessionId} => PID: ${existingFfmpegProcess.pid}`);
 
                 try {
@@ -247,13 +247,13 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
                         existingFfmpegProcess.kill('SIGKILL');
                     }
                 } catch (e) {
-                    this.platform.log.error('Error occurred terminating the video process!');
+                    this.platform.log.error('error occurred terminating the video process!');
                     this.platform.log.error(e);
                 }
 
                 delete this.ongoingSessions[sessionId];
 
-                this.platform.log.debug('Stopped streaming session!');
+                this.platform.log.debug('stopped streaming session!');
                 callback();
                 break;
         }
@@ -266,14 +266,14 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
 
             const ffmpegProcess = this.ongoingSessions[sessionId];
 
-            this.platform.log.info(`Killing: ${this.monitor.monitorConfig.monitor_id} => ${sessionId} => PID: ${ffmpegProcess.pid}`);
+            this.platform.log.info(`killing: ${this.monitor.monitorConfig.monitor_id} => ${sessionId} => PID: ${ffmpegProcess.pid}`);
 
             try {
                 if (ffmpegProcess) {
                     ffmpegProcess.kill('SIGKILL');
                 }
             } catch (e) {
-                this.platform.log.error('Error occurred terminating the video process!');
+                this.platform.log.error('error occurred terminating the video process!');
                 this.platform.log.error(e);
             }
         });

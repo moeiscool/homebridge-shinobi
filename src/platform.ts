@@ -35,23 +35,23 @@ export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
         public readonly config: PlatformConfig,
         public readonly api: API
     ) {
-        log.debug('Finished initializing platform');
+        log.debug('finished initializing platform');
 
         // When this event is fired it means Homebridge has restored all cached accessories from disk.
         api.on(APIEvent.DID_FINISH_LAUNCHING, () => {
-            log.debug('Executing didFinishLaunching callback');
+            log.debug('executing didFinishLaunching callback');
 
             this.createMonitors()
                 .then(() => {
-                    log.debug('Monitors created');
+                    log.debug('monitors created');
                 }).catch((err) => {
-                    log.error(`Failed to create monitors: ${err.message}`);
+                    log.error(`failed to create monitors: ${err.message}`);
                 });
             this.startWebhookListener();
         });
 
         api.on(APIEvent.SHUTDOWN, () => {
-            log.debug('Executed shutdown callback');
+            log.debug('executed shutdown callback');
             this.shutdown();
         });
     }
@@ -61,7 +61,7 @@ export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
      * It should be used to setup event handlers for characteristics and update respective values.
      */
     configureAccessory(accessory: PlatformAccessory) {
-        this.log.info(`Loading accessory from cache: ${accessory.displayName}`);
+        this.log.info(`loading accessory from cache: ${accessory.displayName}`);
 
         // add the restored accessory to the accessories cache so we can track if it has already been registered
         this.existingAccessories.push(accessory);
@@ -77,13 +77,13 @@ export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
             const monitorConfig = this.config.monitors[i];
             const url = `${this.config.shinobi_api}/${this.config.api_key}/monitor/${this.config.group_key}/${monitorConfig.monitor_id}`;
 
-            this.log.debug(`Fetching from Shinobi API: ${url}`);
+            this.log.debug(`fetching from Shinobi API: ${url}`);
 
             fetch(url)
                 .then(res => res.json())
                 .then(shinobiConfig => {
                     return {
-                        displayName: `${monitorConfig.monitorId} monitor`,
+                        displayName: `${monitorConfig.monitor_id} monitor`,
                         monitorConfig,
                         shinobiConfig
                     } as Monitor;
@@ -113,14 +113,14 @@ export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
 
         if (existingAccessory) {
             // the accessory already exists
-            this.log.info(`Found existing accessory for UUID: ${uuid} => ${existingAccessory.displayName}`);
+            this.log.info(`found existing accessory for UUID: ${uuid} => ${existingAccessory.displayName}`);
 
             // create the accessory handler for the restored accessory
             this.monitorsByMonitorId.set(monitorId, new ShinobiMonitorAccessory(this, existingAccessory, monitor));
 
         } else {
             // the accessory does not yet exist, so we need to create it
-            this.log.info(`Adding new accessory: ${monitor.displayName}`);
+            this.log.info(`adding new accessory: ${monitor.displayName}`);
 
             // create a new accessory
             const accessory = new this.api.platformAccessory(monitor.displayName, uuid);
@@ -142,7 +142,7 @@ export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
             const monitorId = request.query.mid;
             const group = request.query.group;
 
-            this.log.debug(`Shinobi motion webhook: group = ${group}, monitorId = ${monitorId}`);
+            this.log.debug(`shinobi motion webhook: group = ${group}, monitorId = ${monitorId}`);
 
             const monitor = this.monitorsByMonitorId.get(monitorId);
 
@@ -163,10 +163,10 @@ export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
                 cert: fs.readFileSync(this.config.https_cert_path)
             };
             https.createServer(options, app).listen(this.config.web_hook_port);
-            this.log.info(`Started HTTPS server for ${PLATFORM_NAME} webhooks on port '${this.config.web_hook_port}'`);
+            this.log.info(`started HTTPS server for ${PLATFORM_NAME} webhooks on port '${this.config.web_hook_port}'`);
         } else {
             app.listen(this.config.web_hook_port);
-            this.log.info(`Started HTTP server for ${PLATFORM_NAME} webhooks on port '${this.config.web_hook_port}'`);
+            this.log.info(`started HTTP server for ${PLATFORM_NAME} webhooks on port '${this.config.web_hook_port}'`);
         }
     }
 
