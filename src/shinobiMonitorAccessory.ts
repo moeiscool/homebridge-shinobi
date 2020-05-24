@@ -1,12 +1,12 @@
 import {
-    Service,
+    CameraControllerOptions,
+    CharacteristicGetCallback,
+    H264Level,
+    H264Profile,
     HAP,
     PlatformAccessory,
-    CharacteristicGetCallback,
-    CameraControllerOptions,
-    SRTPCryptoSuites,
-    H264Profile,
-    H264Level
+    Service,
+    SRTPCryptoSuites
 } from 'homebridge';
 import { ShinobiHomebridgePlatform } from './platform';
 import { ShinobiStreamingDelegate } from './shinobiStreamingDelegate';
@@ -56,16 +56,17 @@ export class ShinobiMonitorAccessory {
         this.shinobiStreamingDelegate = new ShinobiStreamingDelegate(this.platform, this.hap, this.monitor);
 
         const options: CameraControllerOptions = {
-            cameraStreamCount: 2, // HomeKit requires at least 2 streams, but 1 is also just fine
+            cameraStreamCount: 2,
             delegate: this.shinobiStreamingDelegate,
 
             streamingOptions: {
+                srtp: true,
                 proxy: false,
                 supportedCryptoSuites: [SRTPCryptoSuites.AES_CM_128_HMAC_SHA1_80],
                 video: {
                     codec: {
-                        profiles: [H264Profile.HIGH],
-                        levels: [H264Level.LEVEL3_1, H264Level.LEVEL3_2, H264Level.LEVEL4_0]
+                        profiles: [H264Profile.MAIN],
+                        levels: [H264Level.LEVEL4_0]
                     },
                     resolutions: [
                         [640, 360, 20]

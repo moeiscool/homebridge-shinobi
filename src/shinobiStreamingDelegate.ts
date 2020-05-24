@@ -1,4 +1,4 @@
-/* eslint-disable no-case-declarations */
+/* eslint-disable no-case-declarations,@typescript-eslint/camelcase */
 
 import ip from 'ip';
 import fetch from 'node-fetch';
@@ -121,13 +121,9 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
             video: {
                 port: videoPort,
                 ssrc: videoSSRC,
-
-                // eslint-disable-next-line @typescript-eslint/camelcase
                 srtp_key: videoSrtpKey,
-                // eslint-disable-next-line @typescript-eslint/camelcase
                 srtp_salt: videoSrtpSalt
             }
-            // audio is omitted as we do not support audio
         };
 
         this.pendingSessions[sessionId] = sessionInfo;
@@ -171,8 +167,8 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
 
                 this.platform.log.debug(`requested video stream: ${width}x${height}, ${fps} fps, ${maxBitrate} kbps, ${mtu} mtu`);
 
-                let ffmpegCommand = `-i ${this.videoSource} -vsync drop -vcodec copy -an `
-                    + `-f rtp -payload_type ${payloadType} -ssrc ${ssrc} `;
+                let ffmpegCommand = `-fflags +genpts -i ${this.videoSource} -vsync drop -vcodec copy -an `
+                    + `-f rtp -payload_type ${payloadType} -ssrc ${ssrc}`;
 
                 ffmpegCommand += ` -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params ${videoSRTP}`;
 
