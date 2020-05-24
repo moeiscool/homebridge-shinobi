@@ -1,5 +1,7 @@
+/* eslint-disable no-case-declarations */
+
 import ip from 'ip';
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 import { ChildProcess, spawn } from 'child_process';
 import {
     CameraController,
@@ -10,7 +12,6 @@ import {
     PrepareStreamResponse,
     SnapshotRequest,
     SnapshotRequestCallback,
-    SRTPCryptoSuites,
     StreamingRequest,
     StreamRequestCallback,
     StreamRequestTypes,
@@ -18,13 +19,19 @@ import {
     VideoInfo
 } from 'homebridge';
 import { ShinobiHomebridgePlatform } from './platform';
+import { Monitor } from './shinobiMonitorAccessory';
 
 type SessionInfo = {
-    address: string, // address of the HAP controller
-    videoPort: number,
-    videoCryptoSuite: SRTPCryptoSuites, // should be saved if multiple suites are supported
-    videoSRTP: Buffer, // key and salt concatenated
-    videoSSRC: number, // rtp synchronisation source
+    // address of the HAP controller
+    address: string;
+
+    videoPort: number;
+
+    // key and salt concatenated
+    videoSRTP: Buffer;
+
+    // rtp synchronisation source
+    videoSSRC: number;
 }
 
 /**
@@ -44,7 +51,7 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
     constructor(
         private readonly platform: ShinobiHomebridgePlatform,
         private readonly hap: HAP,
-        private readonly monitor: any
+        private readonly monitor: Monitor
     ) {
 
         const shinobiConfig = this.monitor.shinobiConfig;
@@ -69,7 +76,8 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
 
     handleSnapshotRequest(request: SnapshotRequest, callback: SnapshotRequestCallback): void {
 
-        this.platform.log.debug(`handleSnapshotRequest: ${this.monitor.monitorConfig.monitor_id} => ${JSON.stringify(request)} from ${this.imageSource}`);
+        this.platform.log.debug('handleSnapshotRequest: '
+            + `${this.monitor.monitorConfig.monitor_id} => ${JSON.stringify(request)} from ${this.imageSource}`);
 
         fetch(this.imageSource)
             .then(res => res.buffer())
@@ -94,7 +102,6 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
         const video = request.video;
         const videoPort = video.port;
 
-        const videoCryptoSuite = video.srtpCryptoSuite;
         const videoSrtpKey = video.srtp_key;
         const videoSrtpSalt = video.srtp_salt;
 
@@ -104,9 +111,8 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
             address: targetAddress,
 
             videoPort: videoPort,
-            videoCryptoSuite: videoCryptoSuite,
             videoSRTP: Buffer.concat([videoSrtpKey, videoSrtpSalt]),
-            videoSSRC: videoSSRC,
+            videoSSRC: videoSSRC
         };
 
         const currentAddress = ip.address('public', request.addressVersion);
@@ -116,8 +122,10 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
                 port: videoPort,
                 ssrc: videoSSRC,
 
+                // eslint-disable-next-line @typescript-eslint/camelcase
                 srtp_key: videoSrtpKey,
-                srtp_salt: videoSrtpSalt,
+                // eslint-disable-next-line @typescript-eslint/camelcase
+                srtp_salt: videoSrtpSalt
             }
             // audio is omitted as we do not support audio
         };
@@ -139,7 +147,8 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
                 const sessionInfo = this.pendingSessions[sessionId];
 
                 if (!sessionInfo) {
-                    const message = `Unknown sessionIdentifier: ${this.monitor.monitorConfig.monitor_id} => ${sessionId} for start request!`;
+                    const message = 'Unknown sessionIdentifier: '
+                        + `${this.monitor.monitorConfig.monitor_id} => ${sessionId} for start request!`;
                     this.platform.log.warn(message);
                     callback(new Error(message));
                     return;
@@ -158,19 +167,16 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
                 const address = sessionInfo.address;
                 const videoPort = sessionInfo.videoPort;
                 const ssrc = sessionInfo.videoSSRC;
-                const cryptoSuite = sessionInfo.videoCryptoSuite;
                 const videoSRTP = sessionInfo.videoSRTP.toString('base64');
 
                 this.platform.log.debug(`Requested video stream: ${width}x${height}, ${fps} fps, ${maxBitrate} kbps, ${mtu} mtu`);
 
-                let ffmpegCommand = `-i ${this.videoSource} -vsync drop -vcodec copy -an -f rtp -payload_type ${payloadType} -ssrc ${ssrc} `;
+                let ffmpegCommand = `-i ${this.videoSource} -vsync drop -vcodec copy -an `
+                    + `-f rtp -payload_type ${payloadType} -ssrc ${ssrc} `;
 
-                // actually ffmpeg just supports AES_CM_128_HMAC_SHA1_80
-                if (cryptoSuite === SRTPCryptoSuites.AES_CM_128_HMAC_SHA1_80) {
-                    ffmpegCommand += ` -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params ${videoSRTP} s`;
-                }
+                ffmpegCommand += ` -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params ${videoSRTP}`;
 
-                ffmpegCommand += `rtp://${address}:${videoPort}`
+                ffmpegCommand += ` srtp://${address}:${videoPort}`
                     + `?rtcpport=${videoPort}&localrtcpport=${videoPort}&pkt_size=${mtu}`;
 
                 this.platform.log.debug(ffmpegCommand);
@@ -197,7 +203,7 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
                 ffmpegProcess.on('exit', (code, signal) => {
                     const message = `ffmpeg exited with code: ${code} and signal: ${signal}`;
 
-                    if (code == null || code === 255) {
+                    if (code === null || code === 255) {
                         this.platform.log.debug(`${message} (Video stream stopped!)`);
                     } else {
                         this.platform.log.error(`${message} (error)`);
@@ -233,7 +239,8 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
                     return;
                 }
 
-                this.platform.log.info(`Killing: ${this.monitor.monitorConfig.monitor_id} => ${sessionId} => PID: ${existingFfmpegProcess.pid}`);
+                this.platform.log.info(`Killing: ${this.monitor.monitorConfig.monitor_id} `
+                    + `=> ${sessionId} => PID: ${existingFfmpegProcess.pid}`);
 
                 try {
                     if (existingFfmpegProcess) {

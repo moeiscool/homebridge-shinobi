@@ -8,9 +8,17 @@ import {
     H264Profile,
     H264Level
 } from 'homebridge';
-
 import { ShinobiHomebridgePlatform } from './platform';
 import { ShinobiStreamingDelegate } from './shinobiStreamingDelegate';
+
+export type Monitor = {
+    displayName: string;
+    monitorConfig: {
+        monitor_id: string;
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    shinobiConfig: any;
+}
 
 /**
  * Shinobi Monitor Accessory
@@ -18,13 +26,13 @@ import { ShinobiStreamingDelegate } from './shinobiStreamingDelegate';
 export class ShinobiMonitorAccessory {
     public readonly hap: HAP = this.platform.api.hap;
     private motionService: Service;
-    private shinobiStreamingDelegate: ShinobiStreamingDelegate;
+    private readonly shinobiStreamingDelegate: ShinobiStreamingDelegate;
     private motionDetected = false;
 
     constructor(
         private readonly platform: ShinobiHomebridgePlatform,
         private readonly accessory: PlatformAccessory,
-        private readonly monitor: any
+        private readonly monitor: Monitor
     ) {
 
         // set accessory information
@@ -57,7 +65,7 @@ export class ShinobiMonitorAccessory {
                 video: {
                     codec: {
                         profiles: [H264Profile.HIGH],
-                        levels: [H264Level.LEVEL3_1, H264Level.LEVEL3_2, H264Level.LEVEL4_0],
+                        levels: [H264Level.LEVEL3_1, H264Level.LEVEL3_2, H264Level.LEVEL4_0]
                     },
                     resolutions: [
                         [640, 360, 20]

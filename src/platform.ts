@@ -1,13 +1,21 @@
-const fs = require('fs');
-const https = require('https');
+import fs from 'fs';
+import https from 'https';
+import fetch from 'node-fetch';
+import express from 'express';
 
-const fetch = require('node-fetch');
-const express = require('express');
-
-import { API, APIEvent, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
+import {
+    API,
+    APIEvent,
+    DynamicPlatformPlugin,
+    Logger,
+    PlatformAccessory,
+    PlatformConfig,
+    Service,
+    Characteristic
+} from 'homebridge';
 
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
-import { ShinobiMonitorAccessory } from './shinobiMonitorAccessory';
+import { ShinobiMonitorAccessory, Monitor } from './shinobiMonitorAccessory';
 
 /**
  * ShinobiHomebridgePlatform
@@ -33,7 +41,12 @@ export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
         api.on(APIEvent.DID_FINISH_LAUNCHING, () => {
             log.debug('Executing didFinishLaunching callback');
 
-            this.createMonitors();
+            this.createMonitors()
+                .then(() => {
+                    log.debug('Monitors created');
+                }).catch((err) => {
+                    log.error(`Failed to create monitors: ${err.message}`);
+                });
             this.startWebhookListener();
         });
 
@@ -70,11 +83,12 @@ export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
                 .then(res => res.json())
                 .then(shinobiConfig => {
                     return {
+                        displayName: `${monitorConfig.monitorId} monitor`,
                         monitorConfig,
                         shinobiConfig
-                    };
+                    } as Monitor;
                 })
-                .then((monitor) => {
+                .then((monitor: Monitor) => {
                     this.createMonitor(monitor);
                 })
                 .catch(err => {
@@ -84,7 +98,7 @@ export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
         }
     }
 
-    createMonitor(monitor) {
+    createMonitor(monitor: Monitor) {
         this.log.debug('createMonitor()');
 
         const monitorId = monitor.monitorConfig.monitor_id;
@@ -105,8 +119,6 @@ export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
             this.monitorsByMonitorId.set(monitorId, new ShinobiMonitorAccessory(this, existingAccessory, monitor));
 
         } else {
-            monitor.displayName = `${monitorId} monitor`;
-
             // the accessory does not yet exist, so we need to create it
             this.log.info(`Adding new accessory: ${monitor.displayName}`);
 
@@ -139,8 +151,7 @@ export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
                 monitor.setMotionDetected(true);
 
                 response.sendStatus(200);
-            }
-            else {
+            } else {
                 response.sendStatus(400);
             }
 
@@ -153,8 +164,7 @@ export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
             };
             https.createServer(options, app).listen(this.config.web_hook_port);
             this.log.info(`Started HTTPS server for ${PLATFORM_NAME} webhooks on port '${this.config.web_hook_port}'`);
-        }
-        else {
+        } else {
             app.listen(this.config.web_hook_port);
             this.log.info(`Started HTTP server for ${PLATFORM_NAME} webhooks on port '${this.config.web_hook_port}'`);
         }
