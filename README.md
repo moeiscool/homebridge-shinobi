@@ -39,7 +39,7 @@ Where:
 * `api_key` is the Shinobi API key (configured in the Shinobi dashboard API menu)
 * `group_key` is a Shinobi group key
 * `monitors` contains a list of monitors consisting of:
-** `monitor_id`
+    * `monitor_id`
 * `web_hook_port` is the port that the platform should listen on for motion event webhooks from Shinobi
 
 If both `https_key_path` and `https_cert_path` are configured to point at HTTPS key and cert files available on the Homebridge
