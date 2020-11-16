@@ -54,7 +54,11 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
         private readonly monitor: Monitor
     ) {
 
-        const shinobiConfig = this.monitor.shinobiConfig;
+        let shinobiConfig = this.monitor.shinobiConfig;
+
+        if (Array.isArray(shinobiConfig)) {
+            shinobiConfig = this.monitor.shinobiConfig[0];
+        }
 
         this.platform.log.info(`creating ShinobiStreamingDelegate using shinobi config: ${JSON.stringify(shinobiConfig)}`);
 
