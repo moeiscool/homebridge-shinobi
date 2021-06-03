@@ -2,10 +2,10 @@
 > A [Homebridge](https://github.com/nfarina/homebridge) plugin integrating [Shinobi](https://shinobi.video) for motion detector cameras
 
 # Installation
-1. Install homebridge using: `npm install -g homebridge`
+1. Install Homebridge using: `npm install -g homebridge`
 2. Install this plugin: `npm install -g homebridge-shinobi`
-3. Update your `config.json` configuration file
-4. Ensure `ffmpeg` is installed and on the path
+1. Update your configuration file. See a sample `config.json` snippet below.
+4. Ensure `ffmpeg` is installed and on the path.
 
 **NOTE**: Currently there is no support for streaming audio from a camera.
  
@@ -16,7 +16,7 @@ Example `config.json` entry:
 "platforms": [
     {
         "platform": "Shinobi",
-        "shinobi_api": "http:/x.x.x.x:8080",
+        "shinobi_api": "http://x.x.x.x:8080",
         "api_key": "xxx",
         "group_key": "house",
         "monitors": [

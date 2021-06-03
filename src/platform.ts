@@ -28,6 +28,7 @@ export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
     public readonly existingAccessories: PlatformAccessory[] = [];
 
     // this is used to have a reference to monitor accessory handles to listen for homebridge shutdown
+    // and to update state on shinobi webhook callbacks
     private monitorsByMonitorId = new Map<string, ShinobiMonitorAccessory>();
 
     constructor(
@@ -67,7 +68,7 @@ export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
         this.existingAccessories.push(accessory);
     }
 
-    /**1
+    /**
      * This queries shinobi and uses config to determine which monitor accessories to create.
      */
     async createMonitors() {
