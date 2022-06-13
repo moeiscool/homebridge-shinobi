@@ -1,4 +1,4 @@
-/* eslint-disable no-case-declarations,@typescript-eslint/camelcase */
+/* eslint-disable no-case-declarations */
 
 import ip from 'ip';
 import fetch from 'node-fetch';
@@ -247,8 +247,7 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
                         existingFfmpegProcess.kill('SIGKILL');
                     }
                 } catch (e) {
-                    this.platform.log.error('error occurred terminating the video process!');
-                    this.platform.log.error(e);
+                    this.platform.log.error('error occurred terminating the video process! ' + e);
                 }
 
                 delete this.ongoingSessions[sessionId];
@@ -273,8 +272,7 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
                     ffmpegProcess.kill('SIGKILL');
                 }
             } catch (e) {
-                this.platform.log.error('error occurred terminating the video process!');
-                this.platform.log.error(e);
+                this.platform.log.error('error occurred terminating the video process! ' + e);
             }
         });
 
