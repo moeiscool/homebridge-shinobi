@@ -56,7 +56,10 @@ When viewing video, the plugin will use the information returned from the API fo
 the source video stream configured. FFmpeg is used to stream directly from the camera and forward to HomeKit. If possible, 
 the video will not be re-encoded.
 
-Snapshot images for each Monitor are simply pulled from the Shinobi API.
+Snapshot images for each Monitor are simply pulled from the Shinobi API. To ensure these are available, enable the JPEG API for
+each configured Monitor:
+
+![Edit Monitor](images/edit-monitor.png)
 
 A webhook URL should be configured for each Monitor within the Shinobi 'Global Detector Settings' with the following format:
 
