@@ -5,6 +5,7 @@ import {
     H264Profile,
     HAP,
     PlatformAccessory,
+    PlatformConfig,
     Service,
     SRTPCryptoSuites
 } from 'homebridge';
@@ -32,7 +33,8 @@ export class ShinobiMonitorAccessory {
     constructor(
         private readonly platform: ShinobiHomebridgePlatform,
         private readonly accessory: PlatformAccessory,
-        private readonly monitor: Monitor
+        private readonly monitor: Monitor,
+        public readonly config: PlatformConfig
     ) {
 
         // set accessory information
@@ -53,7 +55,7 @@ export class ShinobiMonitorAccessory {
         this.motionService.getCharacteristic(this.platform.Characteristic.MotionDetected)
             .on('get', this.getMotionDetected.bind(this));
 
-        this.shinobiStreamingDelegate = new ShinobiStreamingDelegate(this.platform, this.hap, this.monitor);
+        this.shinobiStreamingDelegate = new ShinobiStreamingDelegate(this.platform, this.hap, this.monitor, this.config);
 
         const options: CameraControllerOptions = {
             cameraStreamCount: 2,
