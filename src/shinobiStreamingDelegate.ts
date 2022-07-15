@@ -173,7 +173,10 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
 
                 this.platform.log.debug(`requested video stream: ${width}x${height}, ${fps} fps, ${maxBitrate} kbps, ${mtu} mtu`);
                 
-                let ffmpegCommand = `${this.config.ffmpeg_input_args} -i ${this.videoSource} ${this.config.ffmpeg_process_args} `
+                const ffmpegInputArgs = this.config.ffmpeg_input_args || '-fflags +genpts';
+                const ffmpegProcessArgs = this.config.ffmpeg_process_args || '-vsync drop -vcodec copy -an';
+
+                let ffmpegCommand = `${ffmpegInputArgs} -i ${this.videoSource} ${ffmpegProcessArgs} `
                     + `-f rtp -payload_type ${payloadType} -ssrc ${ssrc}`;
 
                 ffmpegCommand += ` -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params ${videoSRTP}`;
