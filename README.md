@@ -29,7 +29,9 @@ Example `config.json` entry:
         ],
         "web_hook_port": "8443",
         "https_key_path": "/cert/privkey.pem",
-        "https_cert_path": "/cert/fullchain.pem"
+        "https_cert_path": "/cert/fullchain.pem",
+        "ffmpeg_input_args": "-fflags +genpts",
+        "ffmpeg_process_args": "-vsync drop -vcodec copy -an"
     }
 ]
 ```
@@ -41,6 +43,8 @@ Where:
 * `monitors` contains a list of monitors consisting of:
     * `monitor_id`
 * `web_hook_port` is the port that the platform should listen on for motion event webhooks from Shinobi
+* `ffmpeg_input_args` are the arguments that are applied to the ffmpeg command before the `-i` flag (add `-rtsp_transport tcp` for poor network conditions)
+* `ffmpeg_process_args` are the arguments that are supplied to the ffmpeg command directly after the source stream URL
 
 If both `https_key_path` and `https_cert_path` are configured to point at HTTPS key and cert files available on the Homebridge
 server the webhook server will be hosted on HTTPS.
