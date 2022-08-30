@@ -7,6 +7,7 @@ import {
     CameraController,
     CameraStreamingDelegate,
     HAP,
+    PlatformConfig,
     PrepareStreamCallback,
     PrepareStreamRequest,
     PrepareStreamResponse,
@@ -51,7 +52,8 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
     constructor(
         private readonly platform: ShinobiHomebridgePlatform,
         private readonly hap: HAP,
-        private readonly monitor: Monitor
+        private readonly monitor: Monitor,
+        public readonly config: PlatformConfig
     ) {
 
         let shinobiConfig = this.monitor.shinobiConfig;
@@ -170,8 +172,11 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
                 const videoSRTP = sessionInfo.videoSRTP.toString('base64');
 
                 this.platform.log.debug(`requested video stream: ${width}x${height}, ${fps} fps, ${maxBitrate} kbps, ${mtu} mtu`);
+                
+                const ffmpegInputArgs = this.config.ffmpeg_input_args || '-fflags +genpts';
+                const ffmpegProcessArgs = this.config.ffmpeg_process_args || '-vsync drop -vcodec copy -an';
 
-                let ffmpegCommand = `-fflags +genpts -i ${this.videoSource} -vsync drop -vcodec copy -an `
+                let ffmpegCommand = `${ffmpegInputArgs} -i ${this.videoSource} ${ffmpegProcessArgs} `
                     + `-f rtp -payload_type ${payloadType} -ssrc ${ssrc}`;
 
                 ffmpegCommand += ` -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params ${videoSRTP}`;

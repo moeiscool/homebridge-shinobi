@@ -111,13 +111,12 @@ export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
         // see if an accessory with the same uuid has already been registered and restored from
         // the cached devices we stored in the `configureAccessory` method above
         const existingAccessory = this.existingAccessories.find(accessory => accessory.UUID === uuid);
-
         if (existingAccessory) {
             // the accessory already exists
             this.log.info(`found existing accessory for UUID: ${uuid} => ${existingAccessory.displayName}`);
 
             // create the accessory handler for the restored accessory
-            this.monitorsByMonitorId.set(monitorId, new ShinobiMonitorAccessory(this, existingAccessory, monitor));
+            this.monitorsByMonitorId.set(monitorId, new ShinobiMonitorAccessory(this, existingAccessory, monitor, this.config));
 
         } else {
             // the accessory does not yet exist, so we need to create it
@@ -127,7 +126,7 @@ export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
             const accessory = new this.api.platformAccessory(monitor.displayName, uuid);
 
             // create the accessory handler for the newly created accessory
-            this.monitorsByMonitorId.set(monitorId, new ShinobiMonitorAccessory(this, accessory, monitor));
+            this.monitorsByMonitorId.set(monitorId, new ShinobiMonitorAccessory(this, accessory, monitor, this.config));
 
             // link the accessory to your platform
             this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
