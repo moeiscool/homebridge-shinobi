@@ -46,7 +46,7 @@ Where:
 * `ffmpeg_input_args` are the arguments that are applied to the ffmpeg command before the `-i` flag (add `-rtsp_transport tcp` for poor network conditions)
 * `ffmpeg_process_args` are the arguments that are supplied to the ffmpeg command directly after the source stream URL
 
-If both `https_key_path` and `https_cert_path` are configured to point at HTTPS key and cert files available on the Homebridge
+If the optional properties `https_key_path` and `https_cert_path` are configured to point at HTTPS key and cert files available on the Homebridge
 server the webhook server will be hosted on HTTPS.
 
 #### Shinobi Integration

@@ -46,13 +46,11 @@
       },
       "https_key_path": {
         "type": "string",
-        "description": "If this AND https_cert_path are configured to point at valid files accessible by the platform the webhook server will use HTTPS.",
-        "default": "/cert/privkey.pem"
+        "description": "If this AND https_cert_path are configured to point at valid files accessible by the platform the webhook server will use HTTPS e.g. /cert/privkey.pem"
       },
       "https_cert_path": {
         "type": "string",
-        "description": "If this AND https_key_path are configured to point at valid files accessible by the platform the webhook server will use HTTPS.",
-        "default": "/cert/fullchain.pem"
+        "description": "If this AND https_key_path are configured to point at valid files accessible by the platform the webhook server will use HTTPS e.g. /cert/fullchain.pem"
       },
       "ffmpeg_input_args": {
         "type": "string",
