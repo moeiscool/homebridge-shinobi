@@ -112,8 +112,6 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
 
         this.platform.log.debug(`prepareStream: ${this.monitor.monitorConfig.monitor_id} => ${JSON.stringify(request)}`);
 
-        await this.setRequiredSubStreamState();
-
         const sessionId: StreamSessionIdentifier = request.sessionID;
         const targetAddress = request.targetAddress;
 
@@ -145,6 +143,9 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
         };
 
         this.pendingSessions[sessionId] = sessionInfo;
+
+        await this.setRequiredSubStreamState();
+
         this.platform.log.debug('prepareStream() success');
         callback(undefined, response);
     }
@@ -317,11 +318,13 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
         return fetch(url)
             .then(res => res.json())
             .then(shinobiConfig => {
+                if (Array.isArray(shinobiConfig)) {
+                    shinobiConfig = shinobiConfig[0];
+                }
                 return shinobiConfig.subStreamActive;
             })
             .catch(err => {
                 this.platform.log.error(`getSubStreamIsActive() error: ${err.message}`);
-                throw err;
             });
     }
 
@@ -342,7 +345,6 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
             })
             .catch(err => {
                 this.platform.log.error(`toggleSubStreamActive() error: ${err.message}`);
-                throw err;
             });
     }
 
@@ -353,8 +355,10 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
             return;
         }
         const subStreamShouldBeActive = this.shouldSubStreamBeActive();
+        this.platform.log.debug(`subStreamShouldBeActive: ${subStreamShouldBeActive}`);
 
         const subStreamIsActive = await this.getSubStreamIsActive();
+        this.platform.log.debug(`subStreamIsActive: ${subStreamIsActive}`);
         if (subStreamIsActive !== subStreamShouldBeActive) {
             await this.toggleSubStreamActive(subStreamShouldBeActive);
         }
