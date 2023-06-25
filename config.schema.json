@@ -18,7 +18,7 @@
       },
       "api_key": {
         "type": "string",
-        "description": "the Shinobi API key (configured in the Shinobi dashboard API menu)."
+        "description": "The Shinobi API key (configured in the Shinobi dashboard API menu)."
       },
       "group_key": {
         "type": "string",
@@ -35,6 +35,11 @@
             "monitor_id": {
               "type": "string",
               "description": "The Shinobi monitor ID."
+            },
+            "use_dynamic_substream": {
+              "type": "boolean",
+              "default": false,
+              "description": "Enable support for Shinobi dynamic sub-stream configuration."
             }
           }
         }

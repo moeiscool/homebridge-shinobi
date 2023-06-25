@@ -85,6 +85,7 @@ export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
                 .then(shinobiConfig => {
                     return {
                         displayName: `${monitorConfig.monitor_id} monitor`,
+                        useDynamicSubStream: monitorConfig.use_dynamic_substream === true,
                         monitorConfig,
                         shinobiConfig
                     } as Monitor;

@@ -24,7 +24,8 @@ Example `config.json` entry:
                 "monitor_id": "front"
             },
             {
-                "monitor_id": "rear"
+                "monitor_id": "rear",
+                "use_dynamic_substream": true
             }
         ],
         "web_hook_port": "8443",
@@ -42,6 +43,7 @@ Where:
 * `group_key` is a Shinobi group key
 * `monitors` contains a list of monitors consisting of:
     * `monitor_id`
+    * `use_dynamic_substream` if true will enable support for the [Shinobi Dynamic Substream Functionality](https://hub.shinobi.video/articles/view/xm9HJFXI1XITt1y) for this monitor.
 * `web_hook_port` is the port that the platform should listen on for motion event webhooks from Shinobi
 * `ffmpeg_input_args` are the arguments that are applied to the ffmpeg command before the `-i` flag (add `-rtsp_transport tcp` for poor network conditions)
 * `ffmpeg_process_args` are the arguments that are supplied to the ffmpeg command directly after the source stream URL

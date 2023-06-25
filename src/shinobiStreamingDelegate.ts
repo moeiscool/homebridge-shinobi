@@ -69,14 +69,24 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
         // default to shinobi video source...
         this.videoSource = `${this.platform.config.shinobi_api}${shinobiConfig.streams[0]}`;
 
-        // ...but prefer to connect directly to stream if possible
         const monitorDetails = JSON.parse(shinobiConfig.details);
 
-        if (monitorDetails.auto_host) {
-            this.videoSource = monitorDetails.auto_host;
-            this.platform.log.info(`ShinobiStreamingDelegate using direct camera source: ${this.videoSource}`);
+        // ...but prefer to connect directly to stream if possible
+        if (this.monitor.useDynamicSubStream) {
+            if (monitorDetails.substream && monitorDetails.substream.input && monitorDetails.substream.input.fulladdress) {
+                this.videoSource = monitorDetails.substream.input.fulladdress;
+                this.platform.log.info(`ShinobiStreamingDelegate using shinobi dynamic ' +
+                    'substream direct camera source: ${this.videoSource}`);
+            } else {
+                this.platform.log.info(`ShinobiStreamingDelegate using shinobi dynamic substream proxy source: ${this.videoSource}`);
+            }
         } else {
-            this.platform.log.info(`ShinobiStreamingDelegate using shinobi proxy source: ${this.videoSource}`);
+            if (monitorDetails.auto_host) {
+                this.videoSource = monitorDetails.auto_host;
+                this.platform.log.info(`ShinobiStreamingDelegate using direct camera source: ${this.videoSource}`);
+            } else {
+                this.platform.log.info(`ShinobiStreamingDelegate using shinobi proxy source: ${this.videoSource}`);
+            }
         }
     }
 
@@ -98,9 +108,11 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
     }
 
     // called when iOS requests rtp setup
-    prepareStream(request: PrepareStreamRequest, callback: PrepareStreamCallback): void {
+    async prepareStream(request: PrepareStreamRequest, callback: PrepareStreamCallback): Promise<void> {
 
         this.platform.log.debug(`prepareStream: ${this.monitor.monitorConfig.monitor_id} => ${JSON.stringify(request)}`);
+
+        await this.setRequiredSubStreamState();
 
         const sessionId: StreamSessionIdentifier = request.sessionID;
         const targetAddress = request.targetAddress;
@@ -138,7 +150,7 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
     }
 
     // called when iOS device asks stream to start/stop/reconfigure
-    handleStreamRequest(request: StreamingRequest, callback: StreamRequestCallback): void {
+    async handleStreamRequest(request: StreamingRequest, callback: StreamRequestCallback): Promise<void> {
 
         this.platform.log.debug(`handleStreamRequest: ${JSON.stringify(request)}`);
 
@@ -172,7 +184,7 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
                 const videoSRTP = sessionInfo.videoSRTP.toString('base64');
 
                 this.platform.log.debug(`requested video stream: ${width}x${height}, ${fps} fps, ${maxBitrate} kbps, ${mtu} mtu`);
-                
+
                 const ffmpegInputArgs = this.config.ffmpeg_input_args || '-fflags +genpts';
                 const ffmpegProcessArgs = this.config.ffmpeg_process_args || '-vsync drop -vcodec copy -an';
 
@@ -244,7 +256,7 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
                     return;
                 }
 
-                this.platform.log.info(`killing: ${this.monitor.monitorConfig.monitor_id} `
+                this.platform.log.debug(`killing: ${this.monitor.monitorConfig.monitor_id} `
                     + `=> ${sessionId} => PID: ${existingFfmpegProcess.pid}`);
 
                 try {
@@ -258,19 +270,22 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
                 delete this.ongoingSessions[sessionId];
 
                 this.platform.log.debug('stopped streaming session!');
+
+                await this.setRequiredSubStreamState();
+
                 callback();
                 break;
         }
     }
 
     // called when Homebridge is shutting down
-    shutdown() {
+    async shutdown(): Promise<void> {
 
         Object.keys(this.ongoingSessions).forEach((sessionId) => {
 
             const ffmpegProcess = this.ongoingSessions[sessionId];
 
-            this.platform.log.info(`killing: ${this.monitor.monitorConfig.monitor_id} => ${sessionId} => PID: ${ffmpegProcess.pid}`);
+            this.platform.log.debug(`killing: ${this.monitor.monitorConfig.monitor_id} => ${sessionId} => PID: ${ffmpegProcess.pid}`);
 
             try {
                 if (ffmpegProcess) {
@@ -282,5 +297,66 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
         });
 
         this.ongoingSessions = {};
+        this.pendingSessions = {};
+
+        await this.setRequiredSubStreamState();
+    }
+
+    shouldSubStreamBeActive(): boolean {
+        const ongoingSessionsSessionsExist = (Object.keys(this.ongoingSessions).length > 0);
+        const pendingSessionsExist = (Object.keys(this.pendingSessions).length > 0);
+        return ongoingSessionsSessionsExist || pendingSessionsExist;
+    }
+
+    getSubStreamIsActive(): Promise<boolean> {
+        const url = `${this.platform.config.shinobi_api}/${this.platform.config.api_key}/monitor/` +
+            `${this.platform.config.group_key}/${this.monitor.monitorConfig.monitor_id}`;
+
+        this.platform.log.debug(`fetching from Shinobi API: ${url}`);
+
+        return fetch(url)
+            .then(res => res.json())
+            .then(shinobiConfig => {
+                return shinobiConfig.subStreamActive;
+            })
+            .catch(err => {
+                this.platform.log.error(`getSubStreamIsActive() error: ${err.message}`);
+                throw err;
+            });
+    }
+
+    toggleSubStreamActive(subStreamShouldBeActive): Promise<void> {
+        const url = `${this.platform.config.shinobi_api}/${this.platform.config.api_key}/toggleSubstream/` +
+            `${this.platform.config.group_key}/${this.monitor.monitorConfig.monitor_id}`;
+
+        this.platform.log.debug(`fetching from Shinobi API: ${url}`);
+
+        return fetch(url)
+            .then(res => res.json())
+            .then(shinobiResponse => {
+                this.platform.log.debug(`substream toggle response: ${JSON.stringify(shinobiResponse)}`);
+                if (shinobiResponse.ok !== subStreamShouldBeActive) {
+                    throw Error(`Unable to set substream active state: ${subStreamShouldBeActive}, `+
+                        `response: ${JSON.stringify(shinobiResponse)}`);
+                }
+            })
+            .catch(err => {
+                this.platform.log.error(`toggleSubStreamActive() error: ${err.message}`);
+                throw err;
+            });
+    }
+
+    // do nothing if sub-stream usage is not enabled, otherwise if at least one pending or in ongoing session exists
+    // then ensure the sub-stream state in shinobi is active, otherwise ensure it is not active
+    async setRequiredSubStreamState(): Promise<void> {
+        if (!this.monitor.useDynamicSubStream) {
+            return;
+        }
+        const subStreamShouldBeActive = this.shouldSubStreamBeActive();
+
+        const subStreamIsActive = await this.getSubStreamIsActive();
+        if (subStreamIsActive !== subStreamShouldBeActive) {
+            await this.toggleSubStreamActive(subStreamShouldBeActive);
+        }
     }
 }

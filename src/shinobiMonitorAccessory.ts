@@ -14,6 +14,7 @@ import { ShinobiStreamingDelegate } from './shinobiStreamingDelegate';
 
 export type Monitor = {
     displayName: string;
+    useDynamicSubStream: boolean,
     monitorConfig: {
         monitor_id: string;
     };
