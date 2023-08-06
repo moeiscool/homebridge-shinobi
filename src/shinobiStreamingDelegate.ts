@@ -72,12 +72,13 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
         const monitorDetails = JSON.parse(shinobiConfig.details);
 
         // ...but prefer to connect directly to stream if possible
-        if (this.monitor.useDynamicSubStream) {
+        if (this.monitor.useSubStream) {
             if (monitorDetails.substream && monitorDetails.substream.input && monitorDetails.substream.input.fulladdress) {
                 this.videoSource = monitorDetails.substream.input.fulladdress;
-                this.platform.log.info(`ShinobiStreamingDelegate using shinobi dynamic ' +
+                this.platform.log.info(`ShinobiStreamingDelegate using shinobi ' +
                     'substream direct camera source: ${this.videoSource}`);
             } else {
+                this.monitor.proxyStream = true;
                 this.platform.log.info(`ShinobiStreamingDelegate using shinobi dynamic substream proxy source: ${this.videoSource}`);
             }
         } else {
@@ -85,6 +86,7 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
                 this.videoSource = monitorDetails.auto_host;
                 this.platform.log.info(`ShinobiStreamingDelegate using direct camera source: ${this.videoSource}`);
             } else {
+                this.monitor.proxyStream = true;
                 this.platform.log.info(`ShinobiStreamingDelegate using shinobi proxy source: ${this.videoSource}`);
             }
         }
@@ -348,10 +350,10 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
             });
     }
 
-    // do nothing if sub-stream usage is not enabled, otherwise if at least one pending or in ongoing session exists
-    // then ensure the sub-stream state in shinobi is active, otherwise ensure it is not active
+    // do nothing if proxy dynamic sub-stream usage is not in use, otherwise if at least one pending or ongoing
+    // session exists then ensure the sub-stream state in shinobi is active, otherwise ensure it is not active
     async setRequiredSubStreamState(): Promise<void> {
-        if (!this.monitor.useDynamicSubStream) {
+        if (!(this.monitor.useSubStream && this.monitor.proxyStream)) {
             return;
         }
         const subStreamShouldBeActive = this.shouldSubStreamBeActive();

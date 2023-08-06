@@ -25,7 +25,7 @@ Example `config.json` entry:
             },
             {
                 "monitor_id": "rear",
-                "use_dynamic_substream": true
+                "use_substream": true
             }
         ],
         "web_hook_port": "8443",
@@ -43,7 +43,7 @@ Where:
 * `group_key` is a Shinobi group key
 * `monitors` contains a list of monitors consisting of:
     * `monitor_id`
-    * `use_dynamic_substream` if true will enable support for the [Shinobi Dynamic Substream Functionality](https://hub.shinobi.video/articles/view/xm9HJFXI1XITt1y) for this monitor.
+    * `use_substream` if true will use configured sub-stream for the monitor.
 * `web_hook_port` is the port that the platform should listen on for motion event webhooks from Shinobi
 * `ffmpeg_input_args` are the arguments that are applied to the ffmpeg command before the `-i` flag (add `-rtsp_transport tcp` for poor network conditions)
 * `ffmpeg_process_args` are the arguments that are supplied to the ffmpeg command directly after the source stream URL
@@ -59,8 +59,33 @@ Each of the specified `monitor` IDs will be used with the specified `group_key` 
 to the platform consistent of a Motion Sensor service and camera.
 
 When viewing video, the plugin will use the information returned from the API for a specific Monitor to determine
-the source video stream configured. FFmpeg is used to stream directly from the camera and forward to HomeKit. If possible, 
-the video will not be re-encoded.
+the source video stream to use with the following logic:
+
+```
+if use_substream == false
+  if direct stream URL found in monitor config
+    use direct stream URL
+  else
+    use the first proxy provided by shinobi in monitor config
+else
+  if direct sub-stream URL found in monitor config
+    use direct sub-stream URL
+  else
+    integrate with the [Shinobi Dynamic Substream Functionality](https://hub.shinobi.video/articles/view/xm9HJFXI1XITt1y)
+    use the first proxy provided by shinobi in monitor config
+```
+
+FFmpeg is used to stream from the determined source and forward to HomeKit. If possible, the video will not be re-encoded.
+
+If the dynamic sub-stream functionality is in use, the plugin will:
+
+```
+on CONNECT:
+  check substream enable state and toggle to on if required   
+
+on DISCONNECT:
+  check substream enable state and toggle to off if required   
+```
 
 Snapshot images for each Monitor are simply pulled from the Shinobi API. To ensure these are available, enable the JPEG API for
 each configured Monitor:

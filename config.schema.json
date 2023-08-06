@@ -36,10 +36,10 @@
               "type": "string",
               "description": "The Shinobi monitor ID."
             },
-            "use_dynamic_substream": {
+            "use_substream": {
               "type": "boolean",
               "default": false,
-              "description": "Enable support for Shinobi dynamic sub-stream configuration."
+              "description": "Connect to sub-stream for monitor."
             }
           }
         }
