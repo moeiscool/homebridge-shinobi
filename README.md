@@ -1,6 +1,9 @@
 # homebridge-shinobi
 > A [Homebridge](https://github.com/nfarina/homebridge) plugin integrating [Shinobi](https://shinobi.video) for motion detector cameras
 
+**This plugin is no longer maintained. I have moved to a superior solution using
+Unifi Protect and Unifi Cameras (quite an investment) and the [Homebridge Unifi Protect plugin](https://github.com/hjdhjd/homebridge-unifi-protect).**
+
 # Installation
 1. Install Homebridge using: `npm install -g homebridge`
 2. Install this plugin: `npm install -g homebridge-shinobi`
