@@ -1,3 +1,5 @@
+> Recently this repository was transferred to Shinobi Systems (moeiscool). We do not have complete understanding of its operation and welcome anyone to join us in maintaining it. Please send us any Pull Requests and we will present it to the community for additional review. If the overall consensus is positive (with test results) we will merge those changes.
+
 # homebridge-shinobi
 > A [Homebridge](https://github.com/nfarina/homebridge) plugin integrating [Shinobi](https://shinobi.video) for motion detector cameras
 
