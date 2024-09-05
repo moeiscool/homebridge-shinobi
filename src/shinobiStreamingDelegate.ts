@@ -69,7 +69,14 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
         // default to shinobi video source...
         this.videoSource = `${this.platform.config.shinobi_api}${shinobiConfig.streams[0]}`;
 
-        const monitorDetails = JSON.parse(shinobiConfig.details);
+        let monitorDetails;
+        
+        try {
+            monitorDetails = JSON.parse(shinobiConfig.details);
+        } catch (error) {
+            this.platform.log.warn('Failed to parse shinobiConfig.details as JSON, using raw value.');
+            monitorDetails = shinobiConfig.details;
+        }
 
         // ...but prefer to connect directly to stream if possible
         if (this.monitor.useSubStream) {
