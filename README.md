@@ -62,35 +62,39 @@ Install the Homebridge-Shinobi plugin globally using npm:
 
 ### 6. Update the Configuration File
 Update the configuration file (`config.json`) with the correct settings for the Shinobi plugin. Below is an example configuration:
-> {
->   "platforms": [
->     {
->       "platform": "Shinobi",
->       "shinobi_api": "http://your.shinobi.server",
->       "api_key": "your_api_key_here",
->       "group_key": "your_group_key_here",
->       "monitors": [
->         {
->           "monitor_id": "monitor_1_id",
->           "use_substream": false
->         },
->         {
->           "monitor_id": "monitor_2_id",
->           "use_substream": true
->         },
->         {
->           "monitor_id": "monitor_3_id",
->           "use_substream": true
->         }
->       ],
->       "web_hook_port": "your_webhook_port",
->       "https_key_path": "/path/to/https/key.pem",
->       "https_cert_path": "/path/to/https/cert.pem",
->       "ffmpeg_input_args": "-fflags +genpts",
->       "ffmpeg_process_args": "-vsync drop -vcodec copy -an"
->     }
->   ]
-> }
+
+```
+{
+  "platforms": [
+    {
+      "platform": "Shinobi",
+      "shinobi_api": "http://your.shinobi.server",
+      "api_key": "your_api_key_here",
+      "group_key": "your_group_key_here",
+      "monitors": [
+        {
+          "monitor_id": "monitor_1_id",
+          "use_substream": false
+        },
+        {
+          "monitor_id": "monitor_2_id",
+          "use_substream": true
+        },
+        {
+          "monitor_id": "monitor_3_id",
+          "use_substream": true
+        }
+      ],
+      "web_hook_port": "your_webhook_port",
+      "https_key_path": "/path/to/https/key.pem",
+      "https_cert_path": "/path/to/https/cert.pem",
+      "ffmpeg_input_args": "-fflags +genpts",
+      "ffmpeg_process_args": "-vsync drop -vcodec copy -an"
+    }
+  ]
+}
+
+```
 
 ### 7. Link the Plugin for Local Development (Optional)
 To link the plugin with Homebridge for local development and testing, use the following command:
