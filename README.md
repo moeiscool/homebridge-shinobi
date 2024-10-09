@@ -2,6 +2,7 @@
 > Join our Discord to discuss with the community! https://shinobi.community/
 
 This document was revised by Shamim Shihab Akhtar, Developer at Shinobi Systems
+Old README can be found here https://github.com/moeiscool/homebridge-shinobi/blob/master/README.old.md
 
 # Homebridge-Shinobi Plugin Documentation
 
