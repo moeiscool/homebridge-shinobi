@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge Shinobi",
-  "name": "homebridge-shinobi",
-  "version": "4.0.0",
+  "name": "homebridge-shinobi-official",
+  "version": "4.0.2",
   "description": "A Homebridge plugin integrating Shinobi for motion detector cameras",
   "main": "dist/index.js",
   "repository": {
