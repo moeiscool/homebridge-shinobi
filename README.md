@@ -62,7 +62,7 @@ Install Homebridge globally using npm:
 
 ### 5. Install the Homebridge-Shinobi Plugin
 Install the Homebridge-Shinobi plugin globally using npm:
-> npm install -g homebridge-shinobi
+> npm install -g homebridge-shinobi-official
 
 ### 6. Update the Configuration File
 Update the configuration file (`config.json`) with the correct settings for the Shinobi plugin. Below is an example configuration:
