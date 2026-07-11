@@ -1,5 +1,7 @@
 > ⚠️ Recently this repository was transferred to Shinobi Systems (moeiscool). We do not have complete understanding of its operation and welcome anyone to join us in maintaining it. Please send us any Pull Requests and we will present it to the community for additional review. If the overall consensus is positive (with test results) we will merge those changes.
 > Join our Discord to discuss with the community! https://shinobi.community/
+>
+> Latest npmjs module is at https://www.npmjs.com/package/homebridge-shinobi-official
 
 This document was revised by Shamim Shihab Akhtar, Developer at Shinobi Systems
 
