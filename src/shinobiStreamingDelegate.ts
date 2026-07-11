@@ -71,10 +71,16 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
 
         let monitorDetails;
         
-        try {
-            monitorDetails = JSON.parse(shinobiConfig.details);
-        } catch (error) {
-            this.platform.log.warn('Failed to parse shinobiConfig.details as JSON, using raw value.');
+        if (typeof shinobiConfig.details === 'string') {
+            // Older Shinobi versions return `details` as a JSON string.
+            try {
+                monitorDetails = JSON.parse(shinobiConfig.details);
+            } catch (error) {
+                this.platform.log.warn('Failed to parse shinobiConfig.details as JSON, using raw value.');
+                monitorDetails = shinobiConfig.details;
+            }
+        } else {
+            // Current Shinobi versions return `details` as an already-parsed object.
             monitorDetails = shinobiConfig.details;
         }
 
