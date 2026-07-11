@@ -75,7 +75,7 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
             // Older Shinobi versions return `details` as a JSON string.
             try {
                 monitorDetails = JSON.parse(shinobiConfig.details);
-            } catch (error) {
+            } catch {
                 this.platform.log.warn('Failed to parse shinobiConfig.details as JSON, using raw value.');
                 monitorDetails = shinobiConfig.details;
             }
@@ -148,7 +148,9 @@ export class ShinobiStreamingDelegate implements CameraStreamingDelegate {
 
         const currentAddress = ip.address('public', request.addressVersion);
         const response: PrepareStreamResponse = {
-            address: currentAddress,
+            // Renamed from `address` in HAP v2 (Homebridge v2). Overrides the
+            // automatically determined local RTP endpoint address.
+            addressOverride: currentAddress,
             video: {
                 port: videoPort,
                 ssrc: videoSSRC,

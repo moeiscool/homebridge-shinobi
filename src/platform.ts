@@ -21,8 +21,8 @@ import { ShinobiMonitorAccessory, Monitor } from './shinobiMonitorAccessory';
  * ShinobiHomebridgePlatform
  */
 export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
-    public readonly Service: typeof Service = this.api.hap.Service;
-    public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
+    public readonly Service: typeof Service;
+    public readonly Characteristic: typeof Characteristic;
 
     // this is used to track restored cached accessories
     public readonly existingAccessories: PlatformAccessory[] = [];
@@ -36,6 +36,9 @@ export class ShinobiHomebridgePlatform implements DynamicPlatformPlugin {
         public readonly config: PlatformConfig,
         public readonly api: API
     ) {
+        this.Service = api.hap.Service;
+        this.Characteristic = api.hap.Characteristic;
+
         log.debug('finished initializing platform');
 
         // When this event is fired it means Homebridge has restored all cached accessories from disk.

@@ -27,7 +27,7 @@ export type Monitor = {
  * Shinobi Monitor Accessory
  */
 export class ShinobiMonitorAccessory {
-    public readonly hap: HAP = this.platform.api.hap;
+    public readonly hap: HAP;
     private motionService: Service;
     private readonly shinobiStreamingDelegate: ShinobiStreamingDelegate;
     private motionDetected = false;
@@ -38,6 +38,7 @@ export class ShinobiMonitorAccessory {
         private readonly monitor: Monitor,
         public readonly config: PlatformConfig
     ) {
+        this.hap = platform.api.hap;
 
         // set accessory information
         this.accessory.getService(this.platform.Service.AccessoryInformation)!
